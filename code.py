@@ -3,8 +3,12 @@
 
 import time
 import board
+
 import adafruit_vcnl4010
 from adafruit_bme280 import basic as adafruit_bme280
+import neopixel
+
+pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
 
 DEBUG = False
 
@@ -12,6 +16,9 @@ DEBUG = False
 import supervisor
 supervisor.runtime.autoreload = False
 print("f{supervisor.runtime.autoreload=}") if DEBUG else None
+
+def led_status(on):
+    pixel.fill((255 if on else 0, 0, 0))
 
 
 i2c = board.I2C()   # uses board.SCL and board.SDA
@@ -69,7 +76,8 @@ while True:
             print(f"ALARM: ROTATION_THRESH ({ROTATION_THRESH} seconds) EXCEEDED!")
             in_error = True
             alarm_time = time.monotonic()
-
+            led_status(True)
+            
 
     reading_high = (lux > LUX_THRESH)
     if reading_high == last_reading_high:
@@ -81,6 +89,7 @@ while True:
         if in_error:
             print("  (Alarm cleared)")
         in_error = False
+        led_status(False)
 
 
     time.sleep(SLEEP_TIME)
