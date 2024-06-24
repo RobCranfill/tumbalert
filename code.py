@@ -17,8 +17,8 @@ import supervisor
 supervisor.runtime.autoreload = False
 print("f{supervisor.runtime.autoreload=}") if DEBUG else None
 
-def led_status(on):
-    pixel.fill((255 if on else 0, 0, 0))
+def led_status(color):
+    pixel.fill(color)
 
 
 i2c = board.I2C()   # uses board.SCL and board.SDA
@@ -72,12 +72,13 @@ while True:
             if time.monotonic() > alarm_time + ALARM_AGAIN_TIME:
                 print("  ALARM STILL ON!")
                 alarm_time = time.monotonic()
+                led_status((0,0,255))
         else:
             print(f"ALARM: ROTATION_THRESH ({ROTATION_THRESH} seconds) EXCEEDED!")
             in_error = True
             alarm_time = time.monotonic()
-            led_status(True)
-            
+            led_status((255,0,0))
+
 
     reading_high = (lux > LUX_THRESH)
     if reading_high == last_reading_high:
@@ -89,8 +90,9 @@ while True:
         if in_error:
             print("  (Alarm cleared)")
         in_error = False
-        led_status(False)
+        led_status((0,0,0))
 
-
+    led_status((128,128,128)) if not in_error else None
     time.sleep(SLEEP_TIME)
+    led_status((0,0,0)) if not in_error else None
 
