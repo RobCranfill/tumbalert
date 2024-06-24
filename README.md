@@ -9,7 +9,7 @@ Device to watch a rock tumbler, and alert when it stops rotating.
 * Adafruit 5mW laser diode
 
 # Software
-* Circuitpython (latest, CircuitPython 9.0.5 currently)
+* CircuitPython (latest, CircuitPython 9.0.5 currently)
 * Adafruit libraries:
     * adafruit_vcnl4010 (v 0.11.10 used)
     * adafruit_bme28 (v 2.6.24 used)
@@ -23,4 +23,3 @@ Device to watch a rock tumbler, and alert when it stops rotating.
 * Use extra button on Trinkey 
   - for reset? alarm silence?
 
-  

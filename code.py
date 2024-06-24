@@ -32,6 +32,8 @@ ROTATION_THRESH = 4
 
 SLEEP_TIME = 0.0 # needed??
 
+ALARM_AGAIN_TIME = 2
+
 
 last_reading_high = False
 n = 0
@@ -39,7 +41,7 @@ last_state_change_time = time.monotonic() # ??
 
 # when still in error state
 in_error = False
-
+alarm_time = 0
 
 while True:
 
@@ -58,9 +60,15 @@ while True:
 
     if check_delta > ROTATION_THRESH:
 
-        if not in_error:
+        if in_error:
+            if time.monotonic() > alarm_time + ALARM_AGAIN_TIME:
+                print("AGAIN????")
+                alarm_time = time.monotonic()
+        else:
             print(f"ROTATION_THRESH EXCEEDED!")
             in_error = True
+            alarm_time = time.monotonic()
+
 
     reading_high = (lux > LUX_THRESH)
     if reading_high == last_reading_high:
