@@ -20,6 +20,9 @@ Device to watch a rock tumbler, and alert when it stops rotating.
   * Online
     * Adafruit IO?
     * Something else??
-* Use extra button on Trinkey 
+* Use extra button on Trinkey
   - for reset? alarm silence?
+* Use NeoPixel for status output
+  - flash codes?
+
 

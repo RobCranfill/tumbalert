@@ -6,10 +6,12 @@ import board
 import adafruit_vcnl4010
 from adafruit_bme280 import basic as adafruit_bme280
 
+DEBUG = False
+
 
 import supervisor
 supervisor.runtime.autoreload = False
-print("f{supervisor.runtime.autoreload=}")
+print("f{supervisor.runtime.autoreload=}") if DEBUG else None
 
 
 i2c = board.I2C()   # uses board.SCL and board.SDA
@@ -20,7 +22,6 @@ except:
     print("\n **** No temp sensor? OK\n")
 
 light_sensor = adafruit_vcnl4010.VCNL4010(i2c)
-
 
 
 # lux value threshold
@@ -52,20 +53,20 @@ while True:
 
 
     lux = light_sensor.ambient_lux
-    # print(f"({lux=})")
+    # print(f"({lux=})") if DEBUG else None
 
     check_time = time.monotonic()
     check_delta = check_time - last_state_change_time
-    print(f"{last_reading_high=}, {check_delta=}")
+    print(f"{last_reading_high=}, {check_delta=}") if DEBUG else None
 
     if check_delta > ROTATION_THRESH:
 
         if in_error:
             if time.monotonic() > alarm_time + ALARM_AGAIN_TIME:
-                print("AGAIN????")
+                print("  ALARM STILL ON!")
                 alarm_time = time.monotonic()
         else:
-            print(f"ROTATION_THRESH EXCEEDED!")
+            print(f"ALARM: ROTATION_THRESH ({ROTATION_THRESH} seconds) EXCEEDED!")
             in_error = True
             alarm_time = time.monotonic()
 
@@ -74,9 +75,11 @@ while True:
     if reading_high == last_reading_high:
         pass
     else:
-        print("state change; resetting timer")
+        print("state change; resetting timer") if DEBUG else None
         last_state_change_time = check_time
         last_reading_high = reading_high
+        if in_error:
+            print("  (Alarm cleared)")
         in_error = False
 
 
