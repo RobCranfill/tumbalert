@@ -37,6 +37,9 @@ last_reading_high = False
 n = 0
 last_state_change_time = time.monotonic() # ??
 
+# when still in error state
+in_error = False
+
 
 while True:
 
@@ -55,9 +58,9 @@ while True:
 
     if check_delta > ROTATION_THRESH:
 
-        # how to avoid this happening 'too often'?
-        print(f"ROTATION_THRESH EXCEEDED!")
-
+        if not in_error:
+            print(f"ROTATION_THRESH EXCEEDED!")
+            in_error = True
 
     reading_high = (lux > LUX_THRESH)
     if reading_high == last_reading_high:
@@ -66,6 +69,7 @@ while True:
         print("state change; resetting timer")
         last_state_change_time = check_time
         last_reading_high = reading_high
+        in_error = False
 
 
     time.sleep(SLEEP_TIME)
