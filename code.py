@@ -3,12 +3,19 @@
 
 import time
 import board
+import digitalio
 
 import adafruit_vcnl4010
 from adafruit_bme280 import basic as adafruit_bme280
 import neopixel
 
+
+# some globals. so shoot me.
+
 pixel = neopixel.NeoPixel(board.NEOPIXEL, 1)
+
+button = digitalio.DigitalInOut(board.BUTTON)
+button.switch_to_input(pull=digitalio.Pull.UP)
 
 DEBUG = False
 
@@ -44,14 +51,20 @@ ALARM_AGAIN_TIME = 2
 
 
 last_reading_high = False
-n = 0
+n_warnings = 0
 last_state_change_time = time.monotonic() # ??
 
 # when still in error state
 in_error = False
 alarm_time = 0
 
+
 while True:
+
+    if not button.value: # 'not' is pressed. why?
+        print("Button!")
+        # in_error = False # not sufficient
+
 
     # if temp_sensor is not None:
     #     print("   Temperature: %0.1f C" % temp_sensor.temperature)
@@ -70,29 +83,39 @@ while True:
 
         if in_error:
             if time.monotonic() > alarm_time + ALARM_AGAIN_TIME:
-                print("  ALARM STILL ON!")
+                print(f"  ALARM STILL ON! {reading_high=}")
                 alarm_time = time.monotonic()
-                led_status((0,0,255))
+                led_status((255,255,0))
+
+                n_warnings = n_warnings + 1
+                if n_warnings % 5 == 0:
+                    print("SEND MESSAGE AGAIN")
+
         else:
-            print(f"ALARM: ROTATION_THRESH ({ROTATION_THRESH} seconds) EXCEEDED!")
+            print(f"ALARM: ROTATION_THRESH ({ROTATION_THRESH} seconds) EXCEEDED! {reading_high=}")
             in_error = True
             alarm_time = time.monotonic()
             led_status((255,0,0))
 
-
     reading_high = (lux > LUX_THRESH)
     if reading_high == last_reading_high:
         pass
-    else:
+
+    else: # state change
         print("state change; resetting timer") if DEBUG else None
         last_state_change_time = check_time
         last_reading_high = reading_high
         if in_error:
             print("  (Alarm cleared)")
         in_error = False
-        led_status((0,0,0))
+        
+        led_status((0,0,255)) if reading_high else led_status((0,255,0))
 
-    led_status((128,128,128)) if not in_error else None
+
+    # led_status((128,128,128)) if not in_error else None
     time.sleep(SLEEP_TIME)
-    led_status((0,0,0)) if not in_error else None
+    # led_status((0,0,0)) if not in_error else None
+
+# blue = sensor high, green = sensor low
+# red = initial alarm, yellow = alarm still on
 

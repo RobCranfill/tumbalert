@@ -24,5 +24,7 @@ Device to watch a rock tumbler, and alert when it stops rotating.
   - for reset? alarm silence?
 * Use NeoPixel for status output
   - flash codes?
+* Calculate - and use how? - RPM
+* Temperature sensor
 
 
